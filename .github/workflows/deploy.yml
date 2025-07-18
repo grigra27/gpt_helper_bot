@@ -45,11 +45,12 @@ jobs:
     
     steps:
     - name: Deploy to DigitalOcean
-      uses: appleboy/ssh-action@v1.0.0
+      uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.DO_HOST }}
         username: ${{ secrets.DO_USERNAME }}
         key: ${{ secrets.DO_SSH_KEY }}
+        passphrase: ${{ secrets.DO_SSH_PASSPHRASE }}
         script: |
           # Login to DockerHub
           echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin

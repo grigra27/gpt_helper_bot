@@ -47,7 +47,37 @@ This guide will help you deploy your Telegram ChatGPT bot to DigitalOcean using 
    - Create new Access Token
    - Save the token securely
 
-## 🔑 Step 3: Configure GitHub Secrets
+## 🔑 Step 3: Set Up SSH Key for Deployment
+
+### Option A: Use Existing SSH Key (With or Without Passphrase)
+If you already have an SSH key:
+```bash
+# Copy your existing public key to DigitalOcean droplet
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@your-droplet-ip
+
+# Test SSH connection
+ssh root@your-droplet-ip
+
+# Get private key content for GitHub secrets
+cat ~/.ssh/id_rsa
+```
+
+### Option B: Generate New SSH Key
+```bash
+# Generate SSH key (with or without passphrase - both work!)
+ssh-keygen -t rsa -b 4096 -C "your-email@example.com" -f ~/.ssh/digitalocean_deploy
+
+# Copy public key to your DigitalOcean droplet
+ssh-copy-id -i ~/.ssh/digitalocean_deploy.pub root@your-droplet-ip
+
+# Test SSH connection
+ssh -i ~/.ssh/digitalocean_deploy root@your-droplet-ip
+
+# Get private key content for GitHub secrets
+cat ~/.ssh/digitalocean_deploy
+```
+
+## 🔑 Step 4: Configure GitHub Secrets
 
 In your GitHub repository, go to Settings → Secrets and variables → Actions, and add these secrets:
 
@@ -59,6 +89,7 @@ In your GitHub repository, go to Settings → Secrets and variables → Actions,
 - `DO_HOST`: Your droplet's IP address
 - `DO_USERNAME`: `root` (or your created user)
 - `DO_SSH_KEY`: Your private SSH key content
+- `DO_SSH_PASSPHRASE`: Your SSH key passphrase (only if your key has one)
 
 ### Bot Configuration Secrets
 - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token
@@ -171,6 +202,27 @@ docker run -d --name telegram-chatgpt-bot --restart unless-stopped \
    - Check secrets are correctly set
    - Verify SSH key has proper permissions
    - Check DockerHub credentials
+
+4. **SSH Authentication Issues**:
+   ```bash
+   # Make sure you have the correct secrets set:
+   # - DO_SSH_KEY: Your private key content
+   # - DO_SSH_PASSPHRASE: Your key passphrase (if any)
+   
+   # Test SSH connection manually
+   ssh root@your-droplet-ip
+   
+   # If using passphrase-protected key, make sure DO_SSH_PASSPHRASE secret is set
+   ```
+
+5. **SSH Connection Refused**:
+   ```bash
+   # Check if SSH service is running on server
+   ssh root@your-droplet-ip "systemctl status ssh"
+   
+   # Check firewall settings
+   ssh root@your-droplet-ip "ufw status"
+   ```
 
 ### Useful Commands
 
