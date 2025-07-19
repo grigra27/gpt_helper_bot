@@ -33,13 +33,22 @@ To restrict bot access to only your mom and wife:
 2. Check the logs when they send `/start` to see their user IDs
 3. Or use this temporary code to get their IDs
 
-### 5. Install Dependencies
+### 5. Get Grisha's Telegram ID (For Love Messages)
+
+To enable the "Send Love to Grisha" feature:
+
+1. Have Grisha start a chat with your bot
+2. Check the logs when he sends `/start` to see his user ID
+3. Or use [@userinfobot](https://t.me/userinfobot) - send any message to this bot and it will show your Telegram ID
+4. Add Grisha's ID to `GRISHA_ADMIN_ID` in your `.env` file
+
+### 6. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 6. Configure Environment
+### 7. Configure Environment
 
 1. Copy `.env.example` to `.env`:
    ```bash
@@ -52,9 +61,10 @@ pip install -r requirements.txt
    OPENAI_API_KEY=your_actual_openai_key
    WEATHERAPI_KEY=your_weatherapi_key
    ALLOWED_USER_IDS=123456789,987654321
+   GRISHA_ADMIN_ID=grisha_telegram_user_id
    ```
 
-### 7. Run the Bot
+### 8. Run the Bot
 
 ```bash
 python telegram_chatgpt_bot.py
@@ -67,6 +77,7 @@ python telegram_chatgpt_bot.py
 - ✅ **Secure Access** - Only specified users can use the bot
 - ✅ **ChatGPT Integration** - Natural conversation with ChatGPT
 - ✅ **WeatherAPI.com** - Real-time weather for Phuket, Thailand
+- ✅ **Love Messages** - Send love messages to Grisha with one click! 💕
 - ✅ **Error Handling** - Graceful error handling and logging
 - ✅ **Extensible** - Easy to add new features
 
@@ -77,14 +88,16 @@ python telegram_chatgpt_bot.py
 1. **Start**: Type `/start` → See main menu with buttons
 2. **ChatGPT**: Click "🤖 ChatGPT" button → Type questions naturally
 3. **Weather**: Click "🌤️ Погода в Пхукете" button → Get instant weather
-4. **Navigation**: Use "🔙 Назад в меню" to return to main menu
+4. **Love Message**: Click "💕 Сообщить Грише о своей любви" → Send love to Grisha!
+5. **Navigation**: Use "🔙 Назад в меню" to return to main menu
 
 ### 📱 **User Experience:**
 
 Your family will see:
-- **Main Menu**: Two clear buttons to choose from
+- **Main Menu**: Three clear buttons to choose from
 - **ChatGPT Mode**: Just type questions like talking to a friend
 - **Weather**: Instant weather info for Phuket with one click
+- **Love Messages**: Send romantic messages to Grisha instantly! 💕
 
 ## Usage Examples
 
@@ -106,6 +119,11 @@ Once running, your mom and wife can:
 3. **Get Weather (just click button):**
    ```
    Click: 🌤️ Погода в Пхукете
+   ```
+
+4. **Send Love Message to Grisha (just click button):**
+   ```
+   Click: 💕 Сообщить Грише о своей любви
    ```
 
 ## Adding New Features

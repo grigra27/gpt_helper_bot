@@ -70,6 +70,7 @@ jobs:
             -e OPENAI_API_KEY="${{ secrets.OPENAI_API_KEY }}" \
             -e WEATHERAPI_KEY="${{ secrets.WEATHERAPI_KEY }}" \
             -e ALLOWED_USER_IDS="${{ secrets.ALLOWED_USER_IDS }}" \
+            -e GRISHA_ADMIN_ID="${{ secrets.GRISHA_ADMIN_ID }}" \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE }}:latest
           
           # Clean up old images

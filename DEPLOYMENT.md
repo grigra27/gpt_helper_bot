@@ -96,6 +96,7 @@ In your GitHub repository, go to Settings → Secrets and variables → Actions,
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `WEATHERAPI_KEY`: Your WeatherAPI key
 - `ALLOWED_USER_IDS`: Comma-separated user IDs (e.g., `123456789,987654321`)
+- `GRISHA_ADMIN_ID`: Grisha's Telegram user ID (for love messages)
 
 ## 📁 Step 4: Prepare Your Repository
 

@@ -25,12 +25,18 @@ ALLOWED_USER_IDS = set()
 if os.getenv('ALLOWED_USER_IDS'):
     ALLOWED_USER_IDS = set(map(int, os.getenv('ALLOWED_USER_IDS').split(',')))
 
+# Get Grisha's admin ID (who receives love messages)
+GRISHA_ADMIN_ID = os.getenv('GRISHA_ADMIN_ID')
+if GRISHA_ADMIN_ID:
+    GRISHA_ADMIN_ID = int(GRISHA_ADMIN_ID)
+
 # Conversation states
 MAIN_MENU, CHATGPT_MODE = range(2)
 
 # Button texts
 CHATGPT_BUTTON = "🤖 ChatGPT"
-WEATHER_BUTTON = "🌤️ Погода в Пхукете"
+WEATHER_BUTTON = "🌤️ Погода на Пхукете"
+LOVE_BUTTON = "💕 Сообщить Грише о своей любви"
 BACK_BUTTON = "🔙 Назад в меню"
 
 # Russian text messages
@@ -54,6 +60,9 @@ MESSAGES = {
     
     'chatgpt_error': 'Извините, произошла ошибка при обработке вашего запроса. Попробуйте еще раз через минуту.',
     'weather_error': 'Извините, не удалось получить данные о погоде. Попробуйте позже.',
+    'love_sent': '💕 Ваше сообщение о любви отправлено Грише! Он будет очень рад! 😊',
+    'love_error': 'Извините, не удалось отправить сообщение о любви. Попробуйте позже.',
+    'grisha_not_configured': 'Функция отправки сообщений Грише не настроена.',
     'back_to_menu': 'Возвращаемся в главное меню. Выберите действие:'
 }
 
@@ -65,7 +74,8 @@ def get_main_keyboard():
     """Create main menu keyboard"""
     keyboard = [
         [KeyboardButton(CHATGPT_BUTTON)],
-        [KeyboardButton(WEATHER_BUTTON)]
+        [KeyboardButton(WEATHER_BUTTON)],
+        [KeyboardButton(LOVE_BUTTON)]
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=False)
 
@@ -109,6 +119,10 @@ async def handle_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     
     elif text == WEATHER_BUTTON:
         await weather_command(update, context)
+        return MAIN_MENU
+    
+    elif text == LOVE_BUTTON:
+        await send_love_to_grisha(update, context)
         return MAIN_MENU
     
     else:
@@ -251,7 +265,7 @@ async def weather_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         weather_response += f"💧 Влажность: {humidity}%\n"
         weather_response += f"💨 Ветер: {wind_speed} м/с\n"
         weather_response += f"☀️ УФ-индекс: {uv_index}\n\n"
-        weather_response += f"🕐 Обновлено: {datetime.now().strftime('%H:%M')}"
+        weather_response += f"🕐 Обновлено: {datetime.now().strftime('%H:%M')} (London time)"
         
         await update.message.reply_text(weather_response)
         logger.info(f"Weather data sent to {user_name}")
@@ -265,6 +279,53 @@ async def weather_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     except Exception as e:
         logger.error(f"Error getting weather: {str(e)}")
         await update.message.reply_text(MESSAGES['weather_error'])
+
+async def send_love_to_grisha(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send love message to Grisha (admin)"""
+    user_id = update.effective_user.id
+    user_name = update.effective_user.first_name or "Пользователь"
+    user_last_name = update.effective_user.last_name or ""
+    username = update.effective_user.username
+    
+    if not is_user_allowed(user_id):
+        await update.message.reply_text(MESSAGES['not_authorized'])
+        return
+    
+    # Check if Grisha's admin ID is configured
+    if not GRISHA_ADMIN_ID:
+        await update.message.reply_text(MESSAGES['grisha_not_configured'])
+        logger.error("GRISHA_ADMIN_ID not configured")
+        return
+    
+    logger.info(f"Love message request from {user_name} (ID: {user_id}) to Grisha")
+    
+    try:
+        # Prepare user information
+        full_name = f"{user_name} {user_last_name}".strip()
+        user_info = f"{full_name}"
+        if username:
+            user_info += f" (@{username})"
+        user_info += f" (ID: {user_id})"
+        
+        # Create love message for Grisha
+        love_message = f"💕 Сообщение о любви!\n\n"
+        love_message += f"Пользователь {user_info} любит Вас! 😊❤️\n\n"
+        love_message += f"🕐 Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+        
+        # Send message to Grisha
+        await context.bot.send_message(
+            chat_id=GRISHA_ADMIN_ID,
+            text=love_message
+        )
+        
+        # Confirm to user that message was sent
+        await update.message.reply_text(MESSAGES['love_sent'])
+        
+        logger.info(f"Love message sent from {user_name} (ID: {user_id}) to Grisha (ID: {GRISHA_ADMIN_ID})")
+        
+    except Exception as e:
+        logger.error(f"Error sending love message: {str(e)}")
+        await update.message.reply_text(MESSAGES['love_error'])
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancel conversation and return to main menu"""
